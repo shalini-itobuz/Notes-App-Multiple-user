@@ -22,10 +22,15 @@ export const register = async (req, res) => {
     // Create a new user
     const newUser = new User({ username, email, password: hashedPassword });
     await newUser.save();
+
+    // Generate JWT token
     const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
 
+    // Save token to user's tokens array
+    newUser.tokens.push(token);
+    await newUser.save();
 
-    res.status(201).json({ message: 'User registered successfully.',data:{token,email} });
+    res.status(201).json({ message: 'User registered successfully.', data: { token, email } });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -51,7 +56,11 @@ export const login = async (req, res) => {
     // Generate JWT token
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
 
-    res.json({ message: 'Login successful.', data:{token,email} });
+    // Save token to user's tokens array
+    user.tokens.push(token);
+    await user.save();
+
+    res.json({ message: 'Login successful.', data: { token, email } });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

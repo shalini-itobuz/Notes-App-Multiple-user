@@ -17,6 +17,11 @@ app.use('/api', routes);
 
 connectDB();
 
+app.use((error, req, res, next) => {
+  console.error(error);
+  res.status(500).json({ status: 500, message: error.message , data:null  });
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
